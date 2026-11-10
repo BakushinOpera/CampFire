@@ -9,7 +9,7 @@ Game::Game(GamesEngineeringBase::Window& window) :
     cam(0, 0, window.getWidth(), window.getHeight())
 { 
     //temporary
-    if (!umbrellaImg.load("assets/Umbrella.png"))
+    if (!umbrellaImg.load("assets/umbrella.png"))
         std::cout << "Failed to load player asset." << std::endl;
     else
         std::cout << "Loaded." << std::endl;
@@ -104,30 +104,23 @@ void Game::DrawWorld() {
 }
 
 void Game::DrawBack() {
-//     for (int y = 0;y < canvas.getHeight();y++) {
-//         for (int x = 0;x < canvas.getWidth();x++) {
-//             canvas.draw(x, y, 45, 55, 75);
-//         }
-//     }
-
-	if (backgroundLoaded) {
-		Graphics::DrawSubImg(
-			canvas,
-			backgroundImg,
-			0, 0,
-			1024, 768,
-			0, 0
-		);
-
-		return;
-	}
-
 	// Fallback if the background fails to load
-	for (int y = 0; y < canvas.getHeight(); y++) {
-		for (int x = 0; x < canvas.getWidth(); x++) {
-			canvas.draw(x, y, 111, 111, 111);
-		}
-	}
+	//for (int y = 0; y < canvas.getHeight(); y++) {
+	//	for (int x = 0; x < canvas.getWidth(); x++) {
+	//		canvas.draw(x, y, 111, 111, 111);
+	//	}
+	//}
+
+    if (backgroundLoaded) {
+        Graphics::DrawSubImg(
+            canvas,
+            backgroundImg,
+            0, 0,
+            1024, 768,
+            0, 0
+        );
+    }
+
 }
 
 void Game::SpawnDrop() {
