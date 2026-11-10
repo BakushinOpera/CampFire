@@ -5,18 +5,25 @@
 #include "Graphics.h"
 
 struct projectileType {
-	float damage;
+	float umbrellaDmg;
+	float fireHeat;
 	Box hitbox;
 	GamesEngineeringBase::Image* img;
+	float speed;
 };
+
+enum DropType { Rain = 0, Hail = 1, Branch = 2 };
+
 class Projectile {
 private:
 	float x, y, dirX, dirY, timeleft;
 public:
 	bool active = false;
 
-	static GamesEngineeringBase::Image projImgs[2];
-	static projectileType projTypes[2];
+	static const int TYPE_COUNT = 3;
+	static GamesEngineeringBase::Image projImgs[TYPE_COUNT];
+	static projectileType projTypes[TYPE_COUNT];
+	static int killY;
 
 	const projectileType* type = nullptr;
 
