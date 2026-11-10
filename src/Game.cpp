@@ -1,7 +1,8 @@
 #include "Game.h"
 #include <iostream>
 #include <string>
-
+#include <cstdlib>
+#include <ctime> 
 
 Game::Game(GamesEngineeringBase::Window& window) :
     canvas(window),
@@ -19,14 +20,16 @@ Game::Game(GamesEngineeringBase::Window& window) :
 	  else
 		  std::cout << "Background loaded successfully." << std::endl;
 
-      
-    //Projectile::LoadAssets();
-
     player.SetImg(&umbrellaImg);
 
     float umbrellaWidth = 120.0f;
     player.x = (canvas.getWidth() - umbrellaWidth) / 2.0f;
     player.y = canvas.getHeight() - 220.0f; // <--- Sits right above fire zone
+
+	// Falling objects
+	Projectile::LoadAssets();
+	Projectile::killY = canvas.getHeight();
+	std::srand((unsigned)std::time(nullptr));
 }
 
 void Game::Update(float dt) {
@@ -35,10 +38,17 @@ void Game::Update(float dt) {
     {
     case Screen::Playing:
     {
-        // Update World -- Game Runing
-        //player.Update(dt);
-        //projPool.UpdateAll(dt);
-        //projPool.CheckCollide(player);
+		// Falling objects
+		runTime += dt;
+		spawnInterval = std::max(0.1f, 0.4f - runTime * 0.004f); // Decrease spawn interval over time
+		Projectile::speedScale = std::min(2.0f, 1.0f + runTime * 0.01f); // Increase falling speed over time
+		spawnTimer += dt;
+		if (spawnTimer >= spawnInterval) {
+			spawnTimer -= spawnInterval;
+			SpawnDrop();
+		}
+		projPool.UpdateAll(dt);
+		projPool.CheckCollide(player);
 
         //Umbrella movement speed and controls
         float moveSpeed = 600.0f;
@@ -90,6 +100,7 @@ void Game::DrawWorld() {
 	DrawBack();
 
 	player.Draw(canvas, cam.getX(), cam.getY());
+	projPool.DrawAll(canvas, cam.getX(), cam.getY());
 }
 
 void Game::DrawBack() {
@@ -110,4 +121,17 @@ void Game::DrawBack() {
         );
     }
 
+}
+
+void Game::SpawnDrop() {
+	// Select the type based on probability: Rain 75%, Hail 10%, Branch 15%
+	int r = rand() % 100;
+	DropType t = (r < 75) ? Rain : (r < 85) ? Hail : Branch;
+	const projectileType* dropType = &Projectile::projTypes[t];
+
+	int w = dropType->img->width;
+	int h = dropType->img->height;
+	float x = w / 2.0f + rand() % (canvas.getWidth() - w);
+	float y = -h / 2.0f; 
+	projPool.create(x, y, 0.0f, 1.0f, dropType);
 }

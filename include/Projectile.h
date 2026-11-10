@@ -5,18 +5,26 @@
 #include "Graphics.h"
 
 struct projectileType {
-	float damage;
+	float umbrellaDmg;
+	float fireHeat;
 	Box hitbox;
 	GamesEngineeringBase::Image* img;
+	float speed;
 };
+
+enum DropType { Rain = 0, Hail = 1, Branch = 2 };
+
 class Projectile {
 private:
 	float x, y, dirX, dirY, timeleft;
 public:
 	bool active = false;
 
-	static GamesEngineeringBase::Image projImgs[2];
-	static projectileType projTypes[2];
+	static const int TYPE_COUNT = 3;
+	static GamesEngineeringBase::Image projImgs[TYPE_COUNT];
+	static projectileType projTypes[TYPE_COUNT];
+	static int killY;
+	static float speedScale;   // Falling speed multiplier, increases over time
 
 	const projectileType* type = nullptr;
 
@@ -42,10 +50,12 @@ public:
 	void Update(float dt);
 	void Draw(GamesEngineeringBase::Window& window, int camX, int camY);
 	bool Collide(Characters& player);
+	Box GetBox() const { return Box::OffsetBox(type->hitbox, x, y); }
+	void Kill() { active = false; }
 };
 class ProjectilePool {
 private:
-	static const int pool_size = 32;
+	static const int pool_size = 128;
 	Projectile projectile[pool_size];
 	Projectile* firstAvailable_;
 	int full_cnt = 0;
@@ -105,4 +115,5 @@ public:
 		proj->inFreeList = true;
 	}
 	int getCapacity() { return pool_size; }
+	Projectile* Get(int i) { return &projectile[i]; }
 };
