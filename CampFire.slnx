@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CampFire.vcxproj" Id="8fa2788d-6a18-4db7-9b90-be9386e03e31" />
+</Solution>
