@@ -7,7 +7,7 @@ int main() {
 
     // Create a canvas window with dimensions 1024x768 and title “Tiles"
     GamesEngineeringBase::Window canvas;
-    canvas.create(1024, 768, "Tiles");
+    canvas.create(720, 1024, "Camp Fire");
     bool running = true; // Variable to control the main loop's running state.
 
     GamesEngineeringBase::Timer timer;
