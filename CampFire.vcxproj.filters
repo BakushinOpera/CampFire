@@ -42,6 +42,9 @@
     <ClInclude Include="include\Tilemap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FireSeed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp">
@@ -63,6 +66,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FireSeed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FireSeed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FireSeedManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

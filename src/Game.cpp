@@ -24,6 +24,18 @@ Game::Game(GamesEngineeringBase::Window& window) :
 	else
 		std::cout << "Player loaded successfully." << std::endl;
 
+	// Load the fire seed sprite sheet
+	fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
+
+	if (!fireLoaded)
+	{
+		std::cout << "Failed to load fire seed sprite sheet." << std::endl;
+	}
+	else
+	{
+		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
+	}
+
 	//Projectile::LoadAssets();
 
 	//player.SetInput(&input);
@@ -35,6 +47,8 @@ void Game::Update(float dt) {
 	switch (screen)
 	{
 	case Screen::Playing:
+
+		fireSeeds.Update(dt);
 		// Update World -- Game Runing
 		//player.Update(dt);
 		//projPool.UpdateAll(dt);
@@ -71,7 +85,10 @@ void Game::Draw() {
 void Game::DrawWorld() {
 	//temporary
 	DrawBack();
-
+	if (fireLoaded)
+	{
+		fireSeeds.Draw(canvas, fireImg, cam.getX(), cam.getY());
+	}
 	player.Draw(canvas, cam.getX(), cam.getY());
 }
 

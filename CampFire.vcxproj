@@ -143,6 +143,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FireSeed.h" />
     <ClInclude Include="include\Box.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Characters.h" />
@@ -154,7 +155,10 @@
     <ClInclude Include="include\Tilemap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FireSeed.cpp" />
     <ClCompile Include="src\Character.cpp" />
+    <ClCompile Include="src\FireSeed.cpp" />
+    <ClCompile Include="src\FireSeedManager.cpp" />
     <ClCompile Include="src\Game.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
