@@ -8,7 +8,6 @@ Game::Game(GamesEngineeringBase::Window& window) :
     canvas(window),
     cam(0, 0, window.getWidth(), window.getHeight())
 { 
-    //temporary
     if (!umbrellaImg.load("assets/umbrella.png"))
         std::cout << "Failed to load player asset." << std::endl;
     else
@@ -16,21 +15,21 @@ Game::Game(GamesEngineeringBase::Window& window) :
       
     backgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
     if (!backgroundLoaded)
-		  std::cout << "Failed to load background asset." << std::endl;
-	  else
-		  std::cout << "Background loaded successfully." << std::endl;
+		std::cout << "Failed to load background asset." << std::endl;
+	else
+		std::cout << "Background loaded successfully." << std::endl;
       
     // Load the fire seed sprite sheet
-	  fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
+	fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
 
-	  if (!fireLoaded)
-	  {
-		  std::cout << "Failed to load fire seed sprite sheet." << std::endl;
-	  }
-	  else
-	  {
-		  std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
-	  }
+	if (!fireLoaded)
+	{
+		std::cout << "Failed to load fire seed sprite sheet." << std::endl;
+	}
+	else
+	{
+		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
+	}
 
     player.SetImg(&umbrellaImg);
 
@@ -108,7 +107,6 @@ void Game::Draw() {
 }
 
 void Game::DrawWorld() {
-	//temporary
 	DrawBack();
 	if (fireLoaded)
 	{
@@ -119,13 +117,6 @@ void Game::DrawWorld() {
 }
 
 void Game::DrawBack() {
-	// Fallback if the background fails to load
-	//for (int y = 0; y < canvas.getHeight(); y++) {
-	//	for (int x = 0; x < canvas.getWidth(); x++) {
-	//		canvas.draw(x, y, 111, 111, 111);
-	//	}
-	//}
-
     if (backgroundLoaded) {
         Graphics::DrawSubImg(
             canvas,

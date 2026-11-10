@@ -20,19 +20,17 @@ private:
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
-	//GamesEngineeringBase::Image playerImg, itemImg;
-	GamesEngineeringBase::Image playerImg, itemImg, backgroundImg, fireImg;
+	GamesEngineeringBase::Image umbrellaImg, itemImg, backgroundImg, fireImg;
 	bool backgroundLoaded = false;
 
 	bool fireLoaded = false;
 	FireSeedManager fireSeeds;
 
-	//ProjectilePool projPool;
 	ProjectilePool projPool;
 	float spawnTimer = 0.f;
 	float spawnInterval = 0.4f;
 	float runTime = 0.f;
-	//Input input;
+
 	Characters player;
 
 	void DrawWorld();
