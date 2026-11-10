@@ -9,7 +9,7 @@ Game::Game(GamesEngineeringBase::Window& window) :
 {
 	//Added
 	backgroundLoaded = backgroundImg.load(
-		"assets/background/forest_clearing.png"
+		"assets/background/ForestCampsite.png"
 	);
 
 	if (!backgroundLoaded)
@@ -18,12 +18,11 @@ Game::Game(GamesEngineeringBase::Window& window) :
 		std::cout << "Background loaded successfully." << std::endl;
 
 
-
-	//temporary
-	if (playerImg.load("assets/Soldier.png"))
+	// Load player image
+	if (!playerImg.load("assets/Soldier.png"))
 		std::cout << "Failed to load player asset." << std::endl;
 	else
-		std::cout << "Loaded." << std::endl;
+		std::cout << "Player loaded successfully." << std::endl;
 
 	//Projectile::LoadAssets();
 
