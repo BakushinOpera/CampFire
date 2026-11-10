@@ -8,7 +8,7 @@
 class Characters {
 public:
 	float x = 0, y=0, hp=200;
-	Box hurtbox = { 45,45,15,15 };
+	Box hurtbox = { 0,10,120,50 };
 	GamesEngineeringBase::Image* cImg;
 
 
@@ -23,10 +23,19 @@ public:
 	}
 
 	void Draw(GamesEngineeringBase::Window& window, int camX, int camY) {
-		int IMGwidth = 100;
-		int IMGheight = 100;
-		Graphics::DrawSubImg(window, *cImg, 0,0, IMGwidth, IMGheight, x - camX, y - camY);
+		int srcWidth = cImg->width;
+		int srcHeight = cImg->height;
 
+		int drawWidth = srcWidth;
+		int drawHeight = srcHeight;
+
+		Graphics::DrawSubImg(window, *cImg, 0,0, srcWidth, srcHeight, (int)x - camX, (int)y - camY);
+
+	}
+
+	//gives the exact world space bounding box of the umbrella to help whoever is adding the droplets
+	Box GetWorldBox() const {
+		return Box::OffsetBox(hurtbox, x, y);
 	}
 	
 	void TakeDmg(float dmg) {
