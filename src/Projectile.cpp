@@ -4,7 +4,7 @@
 
 GamesEngineeringBase::Image Projectile::projImgs[Projectile::TYPE_COUNT];
 int Projectile::killY = 1024;
-
+float Projectile::speedScale = 1.0f;
 
 projectileType Projectile::projTypes[Projectile::TYPE_COUNT] = {
 	// umbrellaDmg, fireHeat, hitbox, img, speed
@@ -14,8 +14,8 @@ projectileType Projectile::projTypes[Projectile::TYPE_COUNT] = {
 };;
 
 void Projectile::Move(float dt) {
-	x += dirX * type->speed * dt;
-	y += dirY * type->speed * dt;
+	x += dirX * type->speed * speedScale * dt;
+	y += dirY * type->speed * speedScale * dt;
 	if (y - type->img->height / 2 > killY) 
 	{
 		active = false;
@@ -23,7 +23,7 @@ void Projectile::Move(float dt) {
 }
 
 void Projectile::LoadAssets(){
-	const char* files[TYPE_COUNT] = { "assets/drop_rain.png", "assets/drop_hail2.png", "assets/drop_branch.png" };
+	const char* files[TYPE_COUNT] = { "assets/drop_rain.png", "assets/drop_hail.png", "assets/drop_branch.png" };
 	for (int i = 0;i < TYPE_COUNT;i++) {
 		if (!projImgs[i].load(files[i])) {
 			std::cerr << "Failed to load projectile image: " << files[i] << '\n';
@@ -47,9 +47,9 @@ void Projectile::Draw(GamesEngineeringBase::Window& window, int camX, int camY) 
 
 bool Projectile::Collide(Characters& player) {
 	Box worldBox = Box::OffsetBox(type->hitbox, x, y);
-	if (Box::Overlap(Box::OffsetBox(player.hurtbox, player.x, player.y), worldBox)) {
-		player.TakeDmg(type->umbrellaDmg);
-		active = false;
+	if (Box::Overlap(GetBox(), player.GetWorldBox())) {
+		player.TakeDmg(type->umbrellaDmg);   // rain is 0, with no damage
+		Kill();                              // hide by the umbrella, disappeared
 		return true;
 	}
 	return false;

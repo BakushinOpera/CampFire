@@ -1,35 +1,35 @@
 #include "Game.h"
 #include <iostream>
 #include <string>
-
+#include <cstdlib>
+#include <ctime> 
 
 Game::Game(GamesEngineeringBase::Window& window) :
     canvas(window),
     cam(0, 0, window.getWidth(), window.getHeight())
 { 
     //temporary
-    if (umbrellaImg.load("assets/Umbrella.png"))
+    if (!umbrellaImg.load("assets/Umbrella.png"))
         std::cout << "Failed to load player asset." << std::endl;
     else
         std::cout << "Loaded." << std::endl;
       
-    ackgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
+    backgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
     if (!backgroundLoaded)
 		  std::cout << "Failed to load background asset." << std::endl;
 	  else
 		  std::cout << "Background loaded successfully." << std::endl;
 
-      
-    //Projectile::LoadAssets();
-
     player.SetImg(&umbrellaImg);
-	Projectile::LoadAssets();
-	Projectile::killY = canvas.getHeight();
-	std::srand((unsigned)std::time(nullptr));
 
     float umbrellaWidth = 120.0f;
     player.x = (canvas.getWidth() - umbrellaWidth) / 2.0f;
     player.y = canvas.getHeight() - 220.0f; // <--- Sits right above fire zone
+
+	// Falling objects
+	Projectile::LoadAssets();
+	Projectile::killY = canvas.getHeight();
+	std::srand((unsigned)std::time(nullptr));
 }
 
 void Game::Update(float dt) {
@@ -38,22 +38,17 @@ void Game::Update(float dt) {
     {
     case Screen::Playing:
     {
-        // Update World -- Game Runing
-        //player.Update(dt);
-        //projPool.UpdateAll(dt);
-        //projPool.CheckCollide(player);
-	switch (screen)
-	{
-	case Screen::Playing:
-		// Update World -- Game Runing
+		// Falling objects
+		runTime += dt;
+		spawnInterval = std::max(0.1f, 0.4f - runTime * 0.004f); // Decrease spawn interval over time
+		Projectile::speedScale = std::min(2.0f, 1.0f + runTime * 0.01f); // Increase falling speed over time
 		spawnTimer += dt;
 		if (spawnTimer >= spawnInterval) {
 			spawnTimer -= spawnInterval;
 			SpawnDrop();
 		}
-		//player.Update(dt);
 		projPool.UpdateAll(dt);
-		//projPool.CheckCollide(player);
+		projPool.CheckCollide(player);
 
         //Umbrella movement speed and controls
         float moveSpeed = 600.0f;
@@ -123,6 +118,9 @@ void Game::DrawBack() {
 			1024, 768,
 			0, 0
 		);
+
+		return;
+	}
 
 	// Fallback if the background fails to load
 	for (int y = 0; y < canvas.getHeight(); y++) {

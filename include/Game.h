@@ -23,6 +23,7 @@ private:
 	ProjectilePool projPool;
 	float spawnTimer = 0.f;
 	float spawnInterval = 0.4f;
+	float runTime = 0.f;
 	//Input input;
 	Characters player;
 
