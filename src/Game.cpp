@@ -1,67 +1,92 @@
 #include "Game.h"
 #include <iostream>
 #include <string>
-
+#include <cstdlib>
+#include <ctime> 
 
 Game::Game(GamesEngineeringBase::Window& window) :
-	canvas(window),
-	cam(0, 0, window.getWidth(), window.getHeight())
-{
-	//Added
-	backgroundLoaded = backgroundImg.load(
-		"assets/background/ForestCampsite.png"
-	);
+    canvas(window),
+    cam(0, 0, window.getWidth(), window.getHeight())
+{ 
+    //temporary
+    if (!umbrellaImg.load("assets/umbrella.png"))
+        std::cout << "Failed to load player asset." << std::endl;
+    else
+        std::cout << "Loaded." << std::endl;
+      
+    backgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
+    if (!backgroundLoaded)
+		  std::cout << "Failed to load background asset." << std::endl;
+	  else
+		  std::cout << "Background loaded successfully." << std::endl;
+      
+    // Load the fire seed sprite sheet
+	  fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
 
-	if (!backgroundLoaded)
-		std::cout << "Failed to load background asset." << std::endl;
-	else
-		std::cout << "Background loaded successfully." << std::endl;
+	  if (!fireLoaded)
+	  {
+		  std::cout << "Failed to load fire seed sprite sheet." << std::endl;
+	  }
+	  else
+	  {
+		  std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
+	  }
 
+    player.SetImg(&umbrellaImg);
 
-	// Load player image
-	if (!playerImg.load("assets/Soldier.png"))
-		std::cout << "Failed to load player asset." << std::endl;
-	else
-		std::cout << "Player loaded successfully." << std::endl;
+    float umbrellaWidth = 120.0f;
+    player.x = (canvas.getWidth() - umbrellaWidth) / 2.0f;
+    player.y = canvas.getHeight() - 220.0f; // <--- Sits right above fire zone
 
-	// Load the fire seed sprite sheet
-	fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
-
-	if (!fireLoaded)
-	{
-		std::cout << "Failed to load fire seed sprite sheet." << std::endl;
-	}
-	else
-	{
-		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
-	}
-
-	//Projectile::LoadAssets();
-
-	//player.SetInput(&input);
-	player.SetImg(&playerImg);
+	// Falling objects
+	Projectile::LoadAssets();
+	Projectile::killY = canvas.getHeight();
+	std::srand((unsigned)std::time(nullptr));
 }
 
 void Game::Update(float dt) {
 
-	switch (screen)
-	{
-	case Screen::Playing:
+    switch (screen)
+    {
+    case Screen::Playing:
+    {
+		// Falling objects
+		runTime += dt;
+		spawnInterval = std::max(0.1f, 0.4f - runTime * 0.004f); // Decrease spawn interval over time
+		Projectile::speedScale = std::min(2.0f, 1.0f + runTime * 0.01f); // Increase falling speed over time
+		spawnTimer += dt;
+		if (spawnTimer >= spawnInterval) {
+			spawnTimer -= spawnInterval;
+			SpawnDrop();
+		}
+		projPool.UpdateAll(dt);
+		projPool.CheckCollide(player);
 
-		fireSeeds.Update(dt);
-		// Update World -- Game Runing
-		//player.Update(dt);
-		//projPool.UpdateAll(dt);
-		//projPool.CheckCollide(player);
+        //Umbrella movement speed and controls
+        float moveSpeed = 600.0f;
+        float umbrellaWidth = 120.0f;
 
-		break;
-	case Screen::GameOver:
-		break;
-	default:
-		break;
-	}
+        if (canvas.keyPressed('A') || canvas.keyPressed(VK_LEFT)) {
+            player.x -= moveSpeed * dt;
+        }
+        if (canvas.keyPressed('D') || canvas.keyPressed(VK_RIGHT)) {
+            player.x += moveSpeed * dt;
+        }
 
+        if (player.x < 0.0f) {
+            player.x = 0.0f;
+        }
+        if (player.x > canvas.getWidth() - umbrellaWidth) {
+            player.x = canvas.getWidth() - umbrellaWidth;
+        }
 
+        break;
+    }
+    case Screen::GameOver:
+        break;
+    default:
+        break;
+    }      
 }
 
 void Game::Draw() {
@@ -90,26 +115,38 @@ void Game::DrawWorld() {
 		fireSeeds.Draw(canvas, fireImg, cam.getX(), cam.getY());
 	}
 	player.Draw(canvas, cam.getX(), cam.getY());
+	projPool.DrawAll(canvas, cam.getX(), cam.getY());
 }
 
 void Game::DrawBack() {
-
-	if (backgroundLoaded) {
-		Graphics::DrawSubImg(
-			canvas,
-			backgroundImg,
-			0, 0,
-			1024, 768,
-			0, 0
-		);
-
-		return;
-	}
-
 	// Fallback if the background fails to load
-	for (int y = 0; y < canvas.getHeight(); y++) {
-		for (int x = 0; x < canvas.getWidth(); x++) {
-			canvas.draw(x, y, 111, 111, 111);
-		}
-	}
+	//for (int y = 0; y < canvas.getHeight(); y++) {
+	//	for (int x = 0; x < canvas.getWidth(); x++) {
+	//		canvas.draw(x, y, 111, 111, 111);
+	//	}
+	//}
+
+    if (backgroundLoaded) {
+        Graphics::DrawSubImg(
+            canvas,
+            backgroundImg,
+            0, 0,
+            1024, 768,
+            0, 0
+        );
+    }
+
+}
+
+void Game::SpawnDrop() {
+	// Select the type based on probability: Rain 75%, Hail 10%, Branch 15%
+	int r = rand() % 100;
+	DropType t = (r < 75) ? Rain : (r < 85) ? Hail : Branch;
+	const projectileType* dropType = &Projectile::projTypes[t];
+
+	int w = dropType->img->width;
+	int h = dropType->img->height;
+	float x = w / 2.0f + rand() % (canvas.getWidth() - w);
+	float y = -h / 2.0f; 
+	projPool.create(x, y, 0.0f, 1.0f, dropType);
 }

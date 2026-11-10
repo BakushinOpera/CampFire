@@ -8,6 +8,8 @@
 #include "Input.h"
 #include "Projectile.h"
 #include <algorithm>
+#include <cstdlib>
+#include <ctime>
 
 
 enum class Screen { Playing, GameOver };
@@ -26,11 +28,17 @@ private:
 	FireSeedManager fireSeeds;
 
 	//ProjectilePool projPool;
+	ProjectilePool projPool;
+	float spawnTimer = 0.f;
+	float spawnInterval = 0.4f;
+	float runTime = 0.f;
 	//Input input;
 	Characters player;
 
 	void DrawWorld();
 	void DrawBack();
+	void SpawnDrop();
+
 public:
 	bool quit = false;
 	explicit Game(GamesEngineeringBase::Window& window);
