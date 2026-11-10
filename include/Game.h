@@ -1,24 +1,26 @@
 #pragma once
+#include "Box.h"
+#include "Camera.h"
+#include "Characters.h"
 #include "GamesEngineeringBase.h" 
 #include "Graphics.h"
 #include "Input.h"
-#include "Characters.h"
 #include "Projectile.h"
-#include "Camera.h"
-#include "Box.h"
 #include <algorithm>
 
 
-enum class Screen{Playing, GameOver};
+enum class Screen { Playing, GameOver };
 class Game {
 private:
 	Screen screen = Screen::Playing;
 	Camera cam;
-    GamesEngineeringBase::Window& canvas;
+	GamesEngineeringBase::Window& canvas;
 
-	GamesEngineeringBase::Image playerImg, itemImg;
+	//GamesEngineeringBase::Image playerImg, itemImg;
+	GamesEngineeringBase::Image playerImg, itemImg, backgroundImg;
+	bool backgroundLoaded = false;
 	//ProjectilePool projPool;
-    //Input input;
+	//Input input;
 	Characters player;
 
 	void DrawWorld();
@@ -26,7 +28,7 @@ private:
 public:
 	bool quit = false;
 	explicit Game(GamesEngineeringBase::Window& window);
-    Game(const Game&) = delete;
+	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 	void Update(float dt);
 	void Draw();
