@@ -16,9 +16,9 @@ private:
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
-	//GamesEngineeringBase::Image playerImg, itemImg;
-	GamesEngineeringBase::Image playerImg, itemImg, backgroundImg;
+	GamesEngineeringBase::Image umbrellaImg, itemImg, backgroundImg;
 	bool backgroundLoaded = false;
+
 	//ProjectilePool projPool;
 	//Input input;
 	Characters player;
