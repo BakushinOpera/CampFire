@@ -1,6 +1,6 @@
 #include "Game.h"
-#include <string>
 #include <iostream>
+#include <string>
 
 
 Game::Game(GamesEngineeringBase::Window& window) :
@@ -12,10 +12,16 @@ Game::Game(GamesEngineeringBase::Window& window) :
         std::cout << "Failed to load player asset." << std::endl;
     else
         std::cout << "Loaded." << std::endl;
+      
+    ackgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
+    if (!backgroundLoaded)
+		  std::cout << "Failed to load background asset." << std::endl;
+	  else
+		  std::cout << "Background loaded successfully." << std::endl;
 
+      
     //Projectile::LoadAssets();
 
-    //player.SetInput(&input);
     player.SetImg(&umbrellaImg);
 
     float umbrellaWidth = 120.0f;
@@ -62,34 +68,50 @@ void Game::Update(float dt) {
 }
 
 void Game::Draw() {
-    canvas.clear();
+	canvas.clear();
 
-    switch (screen)
-    {
-    case Screen::Playing:
-        DrawWorld();
-        break;
-    case Screen::GameOver: {
-        DrawBack();
-        break;
-    }
-    default:
-        break;
-    }
-    canvas.present();
+	switch (screen)
+	{
+	case Screen::Playing:
+		DrawWorld();
+		break;
+	case Screen::GameOver: {
+		DrawBack();
+		break;
+	}
+	default:
+		break;
+	}
+	canvas.present();
 }
 
 void Game::DrawWorld() {
-    //temporary
-    DrawBack();
+	//temporary
+	DrawBack();
 
-    player.Draw(canvas, cam.getX(), cam.getY());
+	player.Draw(canvas, cam.getX(), cam.getY());
 }
 
 void Game::DrawBack() {
-    for (int y = 0;y < canvas.getHeight();y++) {
-        for (int x = 0;x < canvas.getWidth();x++) {
-            canvas.draw(x, y, 45, 55, 75);
-        }
-    }
+//     for (int y = 0;y < canvas.getHeight();y++) {
+//         for (int x = 0;x < canvas.getWidth();x++) {
+//             canvas.draw(x, y, 45, 55, 75);
+//         }
+//     }
+
+	if (backgroundLoaded) {
+		Graphics::DrawSubImg(
+			canvas,
+			backgroundImg,
+			0, 0,
+			1024, 768,
+			0, 0
+		);
+
+	// Fallback if the background fails to load
+	for (int y = 0; y < canvas.getHeight(); y++) {
+		for (int x = 0; x < canvas.getWidth(); x++) {
+			canvas.draw(x, y, 111, 111, 111);
+		}
+	}
 }
