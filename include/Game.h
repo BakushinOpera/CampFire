@@ -2,6 +2,7 @@
 #include "Box.h"
 #include "Camera.h"
 #include "Characters.h"
+#include "FireSeedManager.h"
 #include "GamesEngineeringBase.h" 
 #include "Graphics.h"
 #include "Input.h"
@@ -12,14 +13,21 @@
 
 
 enum class Screen { Playing, GameOver };
+
 class Game {
 private:
 	Screen screen = Screen::Playing;
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
-	GamesEngineeringBase::Image umbrellaImg, itemImg, backgroundImg;
+	//GamesEngineeringBase::Image playerImg, itemImg;
+	GamesEngineeringBase::Image playerImg, itemImg, backgroundImg, fireImg;
 	bool backgroundLoaded = false;
+
+	bool fireLoaded = false;
+	FireSeedManager fireSeeds;
+
+	//ProjectilePool projPool;
 	ProjectilePool projPool;
 	float spawnTimer = 0.f;
 	float spawnInterval = 0.4f;
