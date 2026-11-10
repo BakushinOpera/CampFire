@@ -1,14 +1,21 @@
 
 #include "FireSeedManager.h"
 
-// Create and position the five seeds
-FireSeedManager::FireSeedManager()
+// Create the five seeds, centred horizontally near the bottom of the window
+FireSeedManager::FireSeedManager(int screenW, int screenH)
 {
+	const float cell = static_cast<float>(FireSeed::CELL_SIZE);
+
+	// Total width from the left edge of seed 0 to the right edge of seed 4
+	const float totalWidth = (SEED_COUNT - 1) * SPACING + cell;
+
+	const float startX = (static_cast<float>(screenW) - totalWidth) / 2.0f;
+
+	topY = static_cast<float>(screenH) - cell - BOTTOM_MARGIN;
+
 	for (int i = 0; i < SEED_COUNT; i++)
 	{
-		float seedX = START_X + i * SPACING;
-
-		seeds[i].SetPosition(seedX, SEED_Y);
+		seeds[i].SetPosition(startX + i * SPACING, topY);
 	}
 
 	// Start the middle seed with enough heat to burn
@@ -112,4 +119,10 @@ bool FireSeedManager::AllUnlit() const
 	}
 
 	return true;
+}
+
+// Top edge of the seed sprites
+float FireSeedManager::TopY() const
+{
+	return topY;
 }

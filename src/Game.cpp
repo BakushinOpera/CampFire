@@ -1,25 +1,28 @@
 #include "Game.h"
-#include <iostream>
-#include <string>
 #include <cstdlib>
 #include <ctime> 
+#include <iostream>
+#include <string>
 
 Game::Game(GamesEngineeringBase::Window& window) :
-    canvas(window),
-    cam(0, 0, window.getWidth(), window.getHeight())
-{ 
-    if (!umbrellaImg.load("assets/umbrella.png"))
-        std::cout << "Failed to load player asset." << std::endl;
-    else
-        std::cout << "Loaded." << std::endl;
-      
-    backgroundLoaded = backgroundImg.load("assets/background/ForestCampsite.png");
-    if (!backgroundLoaded)
+	canvas(window),
+	cam(0, 0, window.getWidth(), window.getHeight()),
+	// Fire seeds are laid out from the window size
+	fireSeeds((int)window.getWidth(), (int)window.getHeight())
+{
+	if (!umbrellaImg.load("assets/umbrella.png"))
+		std::cout << "Failed to load player asset." << std::endl;
+	else
+		std::cout << "Loaded." << std::endl;
+
+	// New background, drawn at 1024x720 and scaled to the window if the sizes differ
+	backgroundLoaded = backgroundImg.load("assets/background/night_forest.png");
+	if (!backgroundLoaded)
 		std::cout << "Failed to load background asset." << std::endl;
 	else
 		std::cout << "Background loaded successfully." << std::endl;
-      
-    // Load the fire seed sprite sheet
+
+	// Load the fire seed sprite sheet
 	fireLoaded = fireImg.load("assets/fire/fire_seed_sheet_64.png");
 
 	if (!fireLoaded)
@@ -31,11 +34,14 @@ Game::Game(GamesEngineeringBase::Window& window) :
 		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
 	}
 
-    player.SetImg(&umbrellaImg);
+	player.SetImg(&umbrellaImg);
 
-    float umbrellaWidth = 120.0f;
-    player.x = (canvas.getWidth() - umbrellaWidth) / 2.0f;
-    player.y = canvas.getHeight() - 220.0f; // <--- Sits right above fire zone
+	float umbrellaWidth = 120.0f;
+	player.x = (canvas.getWidth() - umbrellaWidth) / 2.0f;
+
+	// The umbrella floats above the fire seeds so it can shield them from the rain:
+	// seed top edge, minus the umbrella height, minus a 40 px gap.
+	player.y = fireSeeds.TopY() - (float)umbrellaImg.height - 40.0f;
 
 	// Falling objects
 	Projectile::LoadAssets();
@@ -45,10 +51,15 @@ Game::Game(GamesEngineeringBase::Window& window) :
 
 void Game::Update(float dt) {
 
-    switch (screen)
-    {
-    case Screen::Playing:
-    {
+	// ESC closes the game
+	if (canvas.keyPressed(VK_ESCAPE)) {
+		quit = true;
+	}
+
+	switch (screen)
+	{
+	case Screen::Playing:
+	{
 		// Falling objects
 		runTime += dt;
 		spawnInterval = std::max(0.1f, 0.4f - runTime * 0.004f); // Decrease spawn interval over time
@@ -61,31 +72,45 @@ void Game::Update(float dt) {
 		projPool.UpdateAll(dt);
 		projPool.CheckCollide(player);
 
-        //Umbrella movement speed and controls
-        float moveSpeed = 600.0f;
-        float umbrellaWidth = 120.0f;
+		// Fire seeds: heat spreading, cooling and sprite animation
+		fireSeeds.Update(dt);
 
-        if (canvas.keyPressed('A') || canvas.keyPressed(VK_LEFT)) {
-            player.x -= moveSpeed * dt;
-        }
-        if (canvas.keyPressed('D') || canvas.keyPressed(VK_RIGHT)) {
-            player.x += moveSpeed * dt;
-        }
+		// TEMP test controls until rain/branch hits change the seeds' heat.
+		// Hold 1-5 to heat that seed, hold Shift + 1-5 to cool it. Delete this block later.
+		{
+			float rate = canvas.keyPressed(VK_SHIFT) ? -60.0f : 60.0f;
+			for (int i = 0; i < fireSeeds.Count(); i++)
+			{
+				if (canvas.keyPressed('1' + i))
+					fireSeeds.Seed(i).ChangeHeat(rate * dt);
+			}
+		}
 
-        if (player.x < 0.0f) {
-            player.x = 0.0f;
-        }
-        if (player.x > canvas.getWidth() - umbrellaWidth) {
-            player.x = canvas.getWidth() - umbrellaWidth;
-        }
+		//Umbrella movement speed and controls
+		float moveSpeed = 600.0f;
+		float umbrellaWidth = 120.0f;
 
-        break;
-    }
-    case Screen::GameOver:
-        break;
-    default:
-        break;
-    }      
+		if (canvas.keyPressed('A') || canvas.keyPressed(VK_LEFT)) {
+			player.x -= moveSpeed * dt;
+		}
+		if (canvas.keyPressed('D') || canvas.keyPressed(VK_RIGHT)) {
+			player.x += moveSpeed * dt;
+		}
+
+		if (player.x < 0.0f) {
+			player.x = 0.0f;
+		}
+		if (player.x > canvas.getWidth() - umbrellaWidth) {
+			player.x = canvas.getWidth() - umbrellaWidth;
+		}
+
+		break;
+	}
+	case Screen::GameOver:
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::Draw() {
@@ -117,16 +142,34 @@ void Game::DrawWorld() {
 }
 
 void Game::DrawBack() {
-    if (backgroundLoaded) {
-        Graphics::DrawSubImg(
-            canvas,
-            backgroundImg,
-            0, 0,
-            1024, 768,
-            0, 0
-        );
-    }
+	const int W = (int)canvas.getWidth();
+	const int H = (int)canvas.getHeight();
 
+	if (!backgroundLoaded) {
+		// Plain dark fallback so the window is never left black and empty
+		for (int y = 0; y < H; y++)
+			for (int x = 0; x < W; x++)
+				canvas.draw(x, y, 20, 24, 42);
+		return;
+	}
+
+	const int iw = (int)backgroundImg.width;
+	const int ih = (int)backgroundImg.height;
+
+	// Same size as the window: straight copy
+	if (iw == W && ih == H) {
+		Graphics::DrawSubImg(canvas, backgroundImg, 0, 0, W, H, 0, 0);
+		return;
+	}
+
+	// Different size: stretch to fill the window (nearest-neighbour keeps the pixels crisp)
+	for (int y = 0; y < H; y++) {
+		const int sy = y * ih / H;
+		for (int x = 0; x < W; x++) {
+			const int sx = x * iw / W;
+			canvas.draw(x, y, backgroundImg.atUnchecked(sx, sy));
+		}
+	}
 }
 
 void Game::SpawnDrop() {
@@ -138,6 +181,6 @@ void Game::SpawnDrop() {
 	int w = dropType->img->width;
 	int h = dropType->img->height;
 	float x = w / 2.0f + rand() % (canvas.getWidth() - w);
-	float y = -h / 2.0f; 
+	float y = -h / 2.0f;
 	projPool.create(x, y, 0.0f, 1.0f, dropType);
 }
