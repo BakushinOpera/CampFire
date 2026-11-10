@@ -9,10 +9,10 @@ public:
 	static constexpr int SEED_COUNT = 5;
 
 private:
-	// Starting arrangement in world coordinates
-	static constexpr float START_X = 320.0f;
-	static constexpr float SEED_Y = 670.0f;
-	static constexpr float SPACING = 80.0f;
+	// Layout (pixels). Everything is worked out from the window size,
+	// so changing the window size in main.cpp does not break the layout.
+	static constexpr float SPACING = 120.0f;       // distance between seed left edges
+	static constexpr float BOTTOM_MARGIN = 72.0f;  // gap between seed bottom and window bottom
 
 	// Heat changes per second
 	static constexpr float UNLIT_COOL = 1.0f;
@@ -25,8 +25,12 @@ private:
 	// Fixed-size array: exactly five seeds
 	FireSeed seeds[SEED_COUNT];
 
+	float topY;   // world Y of the top edge of the seeds
+
 public:
-	FireSeedManager();
+	// screenW / screenH = window size. The seeds are centred horizontally
+	// and sit near the bottom of the window.
+	FireSeedManager(int screenW = 1024, int screenH = 720);
 
 	void Update(float dt);
 
@@ -42,4 +46,8 @@ public:
 	FireSeed& Seed(int index);
 
 	bool AllUnlit() const;
+
+	// Top edge of the seed sprites, so other objects (the umbrella)
+	// can be placed relative to the fire.
+	float TopY() const;
 };
