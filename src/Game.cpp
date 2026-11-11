@@ -54,6 +54,16 @@ Game::Game(GamesEngineeringBase::Window& window) :
 	std::srand((unsigned)std::time(nullptr));
 }
 
+void Game::Restart() {
+	//fireSeeds.Reset();  
+	fireSeeds.Seed(2).ChangeHeat(30);  
+	player.x = (canvas.getWidth() - 120.0f) / 2.0f;
+	projPool.Clear();           
+	runTime = 0.0f;
+	spawnTimer = 0.0f;
+	spawnInterval = 0.4f;
+	Projectile::speedScale = 1.0f;
+}
 void Game::Update(float dt) {
 	input.Update(canvas);
 	const InputState& in = input.GetState();
@@ -129,7 +139,10 @@ void Game::Update(float dt) {
 	case Screen::GameOver: {
 		menuIdx = MenuNav(menuIdx, 2, in);
 		if (in.enter.pressed) {
-			if (menuIdx == 0) screen = Screen::Playing;
+			if (menuIdx == 0) {
+				Restart();
+				screen = Screen::Playing;
+			}
 			else quit = true;
 		}
 		break;
@@ -137,7 +150,10 @@ void Game::Update(float dt) {
 	case Screen::Win: {
 		menuIdx = MenuNav(menuIdx, 2, in);
 		if (in.enter.pressed) {
-			if (menuIdx == 0) screen = Screen::Playing;
+			if (menuIdx == 0) {
+				Restart();
+				screen = Screen::Playing;
+			}
 			else quit = true;
 		}
 		break;
