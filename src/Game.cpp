@@ -56,6 +56,8 @@ Game::Game(GamesEngineeringBase::Window& window) :
 
 void Game::Restart() {
 	//fireSeeds.Reset();  
+	fireSeeds.Seed(2).ChangeHeat(30);  
+	player.x = (canvas.getWidth() - 120.0f) / 2.0f;
 	projPool.Clear();           
 	runTime = 0.0f;
 	spawnTimer = 0.0f;
