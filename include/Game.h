@@ -16,7 +16,7 @@ enum class Screen { Menu, Playing, GameOver, Win };
 
 class Game {
 private:
-	Screen screen = Screen::Win;
+	Screen screen = Screen::Menu;
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
