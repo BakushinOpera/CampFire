@@ -174,6 +174,7 @@ void Game::Draw() {
 	case Screen::GameOver: {
 		DrawBack();
 		DrawTXT("Game Over !", 500, 200);
+		DrawTXT("Time: " + std::to_string((int)runTime) + "s", 500, 250);
 		const std::string options[] = { "Restart", "Exit" };
 		for (int i = 0;i < 2;i++) {
 			int x = 500;
@@ -186,6 +187,7 @@ void Game::Draw() {
 	case Screen::Win: {
 		DrawBack();
 		DrawTXT("You Win !", 500, 200);
+		DrawTXT("Time: " + std::to_string((int)runTime) + "s", 500, 250);
 		const std::string options[] = { "Restart", "Exit" };
 		for (int i = 0;i < 2;i++) {
 			int x = 500;
@@ -209,6 +211,8 @@ void Game::DrawWorld() {
 	}
 	player.Draw(canvas, cam.getX(), cam.getY());
 	projPool.DrawAll(canvas, cam.getX(), cam.getY());
+	int t = (int)runTime;
+	DrawTXT("Time: " + std::to_string(t) + "s", 20, 20);
 }
 
 void Game::DrawBack() {
