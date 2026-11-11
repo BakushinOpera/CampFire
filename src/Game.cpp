@@ -55,17 +55,18 @@ Game::Game(GamesEngineeringBase::Window& window) :
 }
 
 void Game::Update(float dt) {
-
+	input.Update(canvas);
+	const InputState& in = input.GetState();
 	// ESC closes the game
-	if (canvas.keyPressed(VK_ESCAPE)) {
+	if (in.esc.pressed) {
 		quit = true;
 	}
 
 	switch (screen)
 	{
 	case Screen::Menu: {
-		menuIdx = MenuNav(menuIdx, 2);
-		if (canvas.keyPressed(VK_RETURN)) {
+		menuIdx = MenuNav(menuIdx, 2, in);
+		if (in.enter.pressed) {
 			if (menuIdx == 0) screen = Screen::Playing;
 			else quit = true;
 		}
@@ -121,17 +122,33 @@ void Game::Update(float dt) {
 			player.x = canvas.getWidth() - umbrellaWidth;
 		}
 
+		if (fireSeeds.AllLit()) screen = Screen::Win;
+
 		break;
 	}
-	case Screen::GameOver:
+	case Screen::GameOver: {
+		menuIdx = MenuNav(menuIdx, 2, in);
+		if (in.enter.pressed) {
+			if (menuIdx == 0) screen = Screen::Playing;
+			else quit = true;
+		}
 		break;
+	}
+	case Screen::Win: {
+		menuIdx = MenuNav(menuIdx, 2, in);
+		if (in.enter.pressed) {
+			if (menuIdx == 0) screen = Screen::Playing;
+			else quit = true;
+		}
+		break;
+	}
 	default:
 		break;
 	}
 }
-int  Game::MenuNav(int idx, int count) {
-	if (canvas.keyPressed('W')) idx = (idx + 1) % count;
-	if (canvas.keyPressed('S')) idx = (idx - 1 + count) % count;
+int  Game::MenuNav(int idx, int count, const InputState& in) {
+	if (in.uiDown.pressed) idx = (idx + 1) % count;
+	if (in.uiUp.pressed) idx = (idx - 1 + count) % count;
 	return idx;
 }
 
@@ -156,7 +173,26 @@ void Game::Draw() {
 		break;
 	case Screen::GameOver: {
 		DrawBack();
-		DrawTXT("Game Over !", 300, 200);
+		DrawTXT("Game Over !", 500, 200);
+		const std::string options[] = { "Restart", "Exit" };
+		for (int i = 0;i < 2;i++) {
+			int x = 500;
+			int y = 300 + i * 50; // the top position and the distance between
+			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			DrawTXT(options[i], x, y);
+		}
+		break;
+	}
+	case Screen::Win: {
+		DrawBack();
+		DrawTXT("You Win !", 500, 200);
+		const std::string options[] = { "Restart", "Exit" };
+		for (int i = 0;i < 2;i++) {
+			int x = 500;
+			int y = 300 + i * 50; // the top position and the distance between
+			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			DrawTXT(options[i], x, y);
+		}
 		break;
 	}
 	default:

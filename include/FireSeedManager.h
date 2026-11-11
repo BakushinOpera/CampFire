@@ -50,4 +50,6 @@ public:
 	// Top edge of the seed sprites, so other objects (the umbrella)
 	// can be placed relative to the fire.
 	float TopY() const;
+
+	bool AllLit();
 };
