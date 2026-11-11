@@ -53,4 +53,5 @@ public:
 	void DrawEndScreen(const std::string& title, unsigned char r, unsigned char g, unsigned char b);
 	void Draw();
 	int MenuNav(int idx, int count, const InputState& in);
+	void Restart();
 };
