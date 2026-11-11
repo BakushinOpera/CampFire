@@ -126,3 +126,10 @@ float FireSeedManager::TopY() const
 {
 	return topY;
 }
+
+bool FireSeedManager::AllLit() {
+	for (int i = 0;i < SEED_COUNT;i++) {
+		if (seeds[i].GetState() == FireState::Unlit) return false;
+	}
+	return true;
+}
