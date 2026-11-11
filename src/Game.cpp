@@ -71,9 +71,13 @@ void Game::Update(float dt) {
 		}
 		projPool.UpdateAll(dt);
 		projPool.CheckCollide(player);
+		projPool.CheckFireHit(fireSeeds);
 
 		// Fire seeds: heat spreading, cooling and sprite animation
 		fireSeeds.Update(dt);
+
+		if (fireSeeds.AllUnlit())
+			screen = Screen::GameOver;
 
 		// TEMP test controls until rain/branch hits change the seeds' heat.
 		// Hold 1-5 to heat that seed, hold Shift + 1-5 to cool it. Delete this block later.

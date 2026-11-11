@@ -68,3 +68,22 @@ void ProjectilePool::CheckCollide(Characters& player) {
 		if (projectile[i].Collide(player)) continue;
 	}
 }
+
+bool Projectile::HitFire(FireSeedManager& fire) {
+	Box b = GetBox();
+	for (int i = 0;i < fire.Count();i++) {
+		FireSeed& seed = fire.Seed(i);
+		if (Box::Overlap(b, seed.GetBounds())) {
+			seed.ChangeHeat(type->fireHeat);
+			Kill();
+			return true;
+		}
+	}
+	return false;
+}
+
+void ProjectilePool::CheckFireHit(FireSeedManager& fire) {
+	for (int i = 0; i < pool_size; i++) {
+		if (projectile[i].active) projectile[i].HitFire(fire);
+	}
+}

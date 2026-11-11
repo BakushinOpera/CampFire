@@ -3,6 +3,8 @@
 #include "Box.h" 
 #include "Characters.h" 
 #include "Graphics.h"
+#include "FireSeedManager.h"
+
 
 struct projectileType {
 	float umbrellaDmg;
@@ -50,6 +52,7 @@ public:
 	void Update(float dt);
 	void Draw(GamesEngineeringBase::Window& window, int camX, int camY);
 	bool Collide(Characters& player);
+	bool HitFire(FireSeedManager& fire);
 	Box GetBox() const { return Box::OffsetBox(type->hitbox, x, y); }
 	void Kill() { active = false; }
 };
@@ -106,6 +109,7 @@ public:
 	}
 	void DrawAll(GamesEngineeringBase::Window& window, int camX, int camY);
 	void CheckCollide(Characters& player);
+	void CheckFireHit(FireSeedManager& fire);
 	void Release(Projectile* proj) {
 		if (proj == NULL || proj->inFreeList) return;
 		// put the available slot back to pool
