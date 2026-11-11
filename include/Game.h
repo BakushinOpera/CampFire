@@ -12,15 +12,15 @@
 #include <ctime>
 
 
-enum class Screen { Playing, GameOver };
+enum class Screen { Menu, Playing, GameOver };
 
 class Game {
 private:
-	Screen screen = Screen::Playing;
+	Screen screen = Screen::Menu;
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
-	GamesEngineeringBase::Image umbrellaImg, itemImg, backgroundImg, fireImg;
+	GamesEngineeringBase::Image umbrellaImg, itemImg, backgroundImg, fireImg, fontImg;
 	bool backgroundLoaded = false;
 
 	bool fireLoaded = false;
@@ -30,6 +30,8 @@ private:
 	float spawnTimer = 0.f;
 	float spawnInterval = 0.4f;
 	float runTime = 0.f;
+
+	int menuIdx = 0;
 
 	Characters player;
 
@@ -43,5 +45,7 @@ public:
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 	void Update(float dt);
+	void DrawTXT(std::string s, int x, int y);
 	void Draw();
+	int MenuNav(int idx, int count);
 };

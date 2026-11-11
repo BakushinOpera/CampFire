@@ -10,6 +10,7 @@ Game::Game(GamesEngineeringBase::Window& window) :
 	// Fire seeds are laid out from the window size
 	fireSeeds((int)window.getWidth(), (int)window.getHeight())
 {
+	menuIdx = 0;
 	if (!umbrellaImg.load("assets/umbrella.png"))
 		std::cout << "Failed to load player asset." << std::endl;
 	else
@@ -33,6 +34,10 @@ Game::Game(GamesEngineeringBase::Window& window) :
 	{
 		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
 	}
+
+	if(!fontImg.load("assets/font24x30.png")) std::cout << "Failed to load fire seed sprite sheet." << std::endl;
+	else std::cout << "Font image sprite sheet loaded successfully." << std::endl;
+
 
 	player.SetImg(&umbrellaImg);
 
@@ -58,6 +63,14 @@ void Game::Update(float dt) {
 
 	switch (screen)
 	{
+	case Screen::Menu: {
+		menuIdx = MenuNav(menuIdx, 2);
+		if (canvas.keyPressed(VK_RETURN)) {
+			if (menuIdx == 0) screen = Screen::Playing;
+			else quit = true;
+		}
+		break;
+	}
 	case Screen::Playing:
 	{
 		// Falling objects
@@ -116,17 +129,34 @@ void Game::Update(float dt) {
 		break;
 	}
 }
+int  Game::MenuNav(int idx, int count) {
+	if (canvas.keyPressed('W')) idx = (idx + 1) % count;
+	if (canvas.keyPressed('S')) idx = (idx - 1 + count) % count;
+	return idx;
+}
 
 void Game::Draw() {
 	canvas.clear();
 
 	switch (screen)
 	{
+	case Screen::Menu: {
+		DrawBack();
+		const std::string options[] = { "Start", "Exit" };
+		for (int i = 0;i < 2;i++) {
+			int x = 500;
+			int y = 200 + i * 50; // the top position and the distance between
+			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			DrawTXT(options[i], x, y);
+		}
+		break;
+	}
 	case Screen::Playing:
 		DrawWorld();
 		break;
 	case Screen::GameOver: {
 		DrawBack();
+		DrawTXT("Game Over !", 300, 200);
 		break;
 	}
 	default:
@@ -173,6 +203,19 @@ void Game::DrawBack() {
 			const int sx = x * iw / W;
 			canvas.draw(x, y, backgroundImg.atUnchecked(sx, sy));
 		}
+	}
+}
+
+void Game::DrawTXT(std::string s, int x, int y) {
+	int first = 32, cols = 15, rows = 8;
+	int sw = fontImg.width / cols;
+	int sh = fontImg.height / rows;
+
+	for (char c : s) {
+		int idx = c - first;
+		if (idx >= 0 && idx < cols * rows)
+			Graphics::DrawSubImg(canvas, fontImg, (idx % cols) * sw, (idx / cols) * sh, sw, sh, x, y);
+		x += sw;
 	}
 }
 
