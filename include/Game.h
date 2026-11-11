@@ -46,7 +46,11 @@ public:
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 	void Update(float dt);
-	void DrawTXT(std::string s, int x, int y);
+	void DrawTXT(const std::string& s, int x, int y, int scale = 1, unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
+	int TextWidth(const std::string& s, int scale = 1);
+	void DrawTXTCentered(const std::string& s, int y, int scale = 1, unsigned char r = 255, unsigned char g = 255, unsigned char b = 255);
+	void DimScreen(float k);
+	void DrawEndScreen(const std::string& title, unsigned char r, unsigned char g, unsigned char b);
 	void Draw();
 	int MenuNav(int idx, int count, const InputState& in);
 };
