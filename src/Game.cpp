@@ -178,7 +178,7 @@ void Game::Draw() {
 		for (int i = 0;i < 2;i++) {
 			int x = 500;
 			int y = 300 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			if (i == menuIdx) DrawTXT(">", x - 32, y);
 			DrawTXT(options[i], x, y);
 		}
 		break;
@@ -190,7 +190,7 @@ void Game::Draw() {
 		for (int i = 0;i < 2;i++) {
 			int x = 500;
 			int y = 300 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			if (i == menuIdx) DrawTXT(">", x - 32, y);
 			DrawTXT(options[i], x, y);
 		}
 		break;
