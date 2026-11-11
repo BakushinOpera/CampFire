@@ -175,44 +175,27 @@ void Game::Draw() {
 	{
 	case Screen::Menu: {
 		DrawBack();
+		DrawTXTCentered("Camp Fire", 130, 3, 255, 200, 90);   // fire gold title
+
 		const std::string options[] = { "Start", "Exit" };
-		for (int i = 0;i < 2;i++) {
-			int x = 500;
-			int y = 200 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 32, y);
-			DrawTXT(options[i], x, y);
+		const int x = ((int)canvas.getWidth() - TextWidth("Start")) / 2;
+		for (int i = 0; i < 2; i++) {
+			const int y = 330 + i * 50;
+			const bool sel = (i == menuIdx);
+			if (sel) DrawTXT(">", x - 32, y);
+			DrawTXT(options[i], x, y, 1, sel ? 255 : 150, sel ? 255 : 160, sel ? 255 : 190);
 		}
 		break;
 	}
 	case Screen::Playing:
 		DrawWorld();
 		break;
-	case Screen::GameOver: {
-		DrawBack();
-		DrawTXT("Game Over !", 500, 200);
-		DrawTXT("Time: " + std::to_string((int)runTime) + "s", 500, 250);
-		const std::string options[] = { "Restart", "Exit" };
-		for (int i = 0;i < 2;i++) {
-			int x = 500;
-			int y = 300 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 32, y);
-			DrawTXT(options[i], x, y);
-		}
+	case Screen::GameOver:
+		DrawEndScreen("Game Over", 235, 95, 75);
 		break;
-	}
-	case Screen::Win: {
-		DrawBack();
-		DrawTXT("You Win !", 500, 200);
-		DrawTXT("Time: " + std::to_string((int)runTime) + "s", 500, 250);
-		const std::string options[] = { "Restart", "Exit" };
-		for (int i = 0;i < 2;i++) {
-			int x = 500;
-			int y = 300 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 32, y);
-			DrawTXT(options[i], x, y);
-		}
+	case Screen::Win:
+		DrawEndScreen("You Win!", 255, 200, 90);
 		break;
-	}
 	default:
 		break;
 	}
@@ -262,16 +245,67 @@ void Game::DrawBack() {
 	}
 }
 
-void Game::DrawTXT(std::string s, int x, int y) {
-	int first = 32, cols = 15, rows = 8;
-	int sw = fontImg.width / cols;
-	int sh = fontImg.height / rows;
+void Game::DrawTXT(const std::string& s, int x, int y, int scale,
+	unsigned char r, unsigned char g, unsigned char b) {
+	const int first = 32, cols = 15, rows = 8;
+	const int sw = fontImg.width / cols;
+	const int sh = fontImg.height / rows;
+	const int W = (int)canvas.getWidth(), H = (int)canvas.getHeight();
 
 	for (char c : s) {
-		int idx = c - first;
-		if (idx >= 0 && idx < cols * rows)
-			Graphics::DrawSubImg(canvas, fontImg, (idx % cols) * sw, (idx / cols) * sh, sw, sh, x, y);
-		x += sw;
+		int idx = (unsigned char)c - first;
+		if (idx >= 0 && idx < cols * rows) {
+			const int srcX = (idx % cols) * sw, srcY = (idx / cols) * sh;
+			for (int j = 0; j < sh; j++) {
+				for (int i = 0; i < sw; i++) {
+					if (fontImg.alphaAt(srcX + i, srcY + j) == 0) continue;
+					unsigned char* p = fontImg.at(srcX + i, srcY + j);
+					const bool letter = p[0] > 128;   // white = letter (tint it), dark = shadow (keep)
+					const unsigned char cr = letter ? r : p[0], cg = letter ? g : p[1], cb = letter ? b : p[2];
+					for (int dy = 0; dy < scale; dy++) {
+						const int py = y + j * scale + dy;
+						if (py < 0 || py >= H) continue;
+						for (int dx = 0; dx < scale; dx++) {
+							const int px = x + i * scale + dx;
+							if (px >= 0 && px < W) canvas.draw(px, py, cr, cg, cb);
+						}
+					}
+				}
+			}
+		}
+		x += sw * scale;
+	}
+}
+
+int Game::TextWidth(const std::string& s, int scale) {
+	return (int)s.size() * (fontImg.width / 15) * scale;
+}
+
+void Game::DrawTXTCentered(const std::string& s, int y, int scale,
+	unsigned char r, unsigned char g, unsigned char b) {
+	DrawTXT(s, ((int)canvas.getWidth() - TextWidth(s, scale)) / 2, y, scale, r, g, b);
+}
+
+void Game::DimScreen(float k) {
+	unsigned char* buf = canvas.getBackBuffer();
+	const int n = (int)(canvas.getWidth() * canvas.getHeight() * 3);
+	for (int i = 0; i < n; i++) buf[i] = (unsigned char)(buf[i] * k);
+}
+
+void Game::DrawEndScreen(const std::string& title, unsigned char r, unsigned char g, unsigned char b) {
+	DrawBack();
+	DimScreen(0.5f);
+
+	DrawTXTCentered(title, 130, 3, r, g, b);
+	DrawTXTCentered("Time: " + std::to_string((int)runTime) + "s", 290, 1, 190, 200, 230);
+
+	const std::string options[] = { "Restart", "Exit" };
+	const int x = ((int)canvas.getWidth() - TextWidth("Restart")) / 2;
+	for (int i = 0; i < 2; i++) {
+		const int y = 380 + i * 50;
+		const bool sel = (i == menuIdx);
+		if (sel) DrawTXT(">", x - 32, y);
+		DrawTXT(options[i], x, y, 1, sel ? 255 : 150, sel ? 255 : 160, sel ? 255 : 190);
 	}
 }
 
