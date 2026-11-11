@@ -12,11 +12,11 @@
 #include <ctime>
 
 
-enum class Screen { Menu, Playing, GameOver };
+enum class Screen { Menu, Playing, GameOver, Win };
 
 class Game {
 private:
-	Screen screen = Screen::Menu;
+	Screen screen = Screen::Win;
 	Camera cam;
 	GamesEngineeringBase::Window& canvas;
 
@@ -32,6 +32,7 @@ private:
 	float runTime = 0.f;
 
 	int menuIdx = 0;
+	Input input;
 
 	Characters player;
 
@@ -47,5 +48,5 @@ public:
 	void Update(float dt);
 	void DrawTXT(std::string s, int x, int y);
 	void Draw();
-	int MenuNav(int idx, int count);
+	int MenuNav(int idx, int count, const InputState& in);
 };
