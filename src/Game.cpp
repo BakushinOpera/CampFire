@@ -35,7 +35,7 @@ Game::Game(GamesEngineeringBase::Window& window) :
 		std::cout << "Fire seed sprite sheet loaded successfully." << std::endl;
 	}
 
-	if(!fontImg.load("assets/font24x30.png")) std::cout << "Failed to load fire seed sprite sheet." << std::endl;
+	if(!fontImg.load("assets/font.png")) std::cout << "Failed to load font sprite sheet." << std::endl;
 	else std::cout << "Font image sprite sheet loaded successfully." << std::endl;
 
 
@@ -146,7 +146,7 @@ void Game::Draw() {
 		for (int i = 0;i < 2;i++) {
 			int x = 500;
 			int y = 200 + i * 50; // the top position and the distance between
-			if (i == menuIdx) DrawTXT(">", x - 20, y);
+			if (i == menuIdx) DrawTXT(">", x - 32, y);
 			DrawTXT(options[i], x, y);
 		}
 		break;
